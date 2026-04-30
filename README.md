@@ -10,7 +10,6 @@ The framework uses Playwright where it adds the most value: real browser journey
 |---|---|---|
 | Portfolio page | https://elmondino.github.io/VolyGroup-Playwright-Demo/ | Public summary page |
 | Latest Playwright report | https://elmondino.github.io/VolyGroup-Playwright-Demo/report/ | Static HTML report, no install needed |
-| Source code | https://github.com/elmondino/VolyGroup-Playwright-Demo | Public repository |
 
 The Playwright HTML report is the main stakeholder view. It is hosted on GitHub Pages and opens like a normal website. It includes the latest test results, traces, screenshots, errors, retries, and timing data.
 
