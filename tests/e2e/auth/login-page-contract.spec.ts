@@ -6,12 +6,17 @@ test.describe('Login page contract', () => {
   test('Log In button on volygroup.com opens the login app in a new tab @smoke', async ({
     page,
     navigate,
-  }) => {
+  }, testInfo) => {
     await navigate(URLS.home);
+
+    const isMobile = (testInfo.project.use.viewport?.width ?? 1280) < 900;
+    if (isMobile) {
+      await page.getByRole('button', { name: /menu|navigation/i }).first().click();
+    }
 
     const [loginTab] = await Promise.all([
       page.context().waitForEvent('page'),
-      page.getByRole('link', { name: /log in/i }).click(),
+      page.getByRole('link', { name: /log in/i }).first().click(),
     ]);
 
     await loginTab.waitForLoadState('domcontentloaded');

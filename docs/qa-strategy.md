@@ -13,6 +13,7 @@ Playwright is used for browser behaviour that needs a real page:
 - Cookie banner behaviour.
 - Basic page routing and page identity checks.
 - Cross-browser smoke coverage in Firefox and WebKit.
+- Responsive smoke coverage on mobile (Pixel 7) and tablet (iPad) viewports.
 - Static HTML reports with traces and screenshots.
 
 The default gate stays small so every push gets fast, high-signal feedback.
@@ -28,7 +29,7 @@ npx playwright test tests/e2e/products/ --project=chromium
 npx playwright test tests/e2e/auth/ --project=chromium
 ```
 
-Targeted scripts run in Chromium by default. Cross-browser coverage is added where browser differences are meaningful.
+The default gate runs in Chromium for speed. CI extends the same smoke set to Firefox, WebKit, mobile, and tablet so layout and engine differences are caught automatically.
 
 ## Tooling Boundaries
 

@@ -109,7 +109,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [firefox, webkit]
+        browser: [firefox, webkit, mobile-chrome, tablet]
 
     steps:
       - uses: actions/checkout@v4
@@ -122,8 +122,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install ${{ matrix.browser }} browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Install browsers
+        run: |
+          case "${{ matrix.browser }}" in
+            mobile-chrome|tablet)
+              npx playwright install --with-deps chromium webkit
+              ;;
+            *)
+              npx playwright install --with-deps ${{ matrix.browser }}
+              ;;
+          esac
 
       - name: Run smoke suite on ${{ matrix.browser }}
         run: npx playwright test --grep @smoke --grep-invert @performance --project=${{ matrix.browser }}

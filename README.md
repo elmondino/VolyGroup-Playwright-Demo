@@ -23,6 +23,7 @@ The Playwright HTML report is the main stakeholder view. It is hosted on GitHub 
 - Cookie consent behaviour.
 - Footer, legal, news, and navigation checks.
 - Firefox and WebKit smoke coverage in CI.
+- Mobile and tablet viewport smoke coverage in CI (Pixel 7 and iPad).
 - Targeted accessibility, SEO, browser health, and performance suites.
 
 ## Test Strategy
@@ -33,6 +34,7 @@ The suite is split into a small default gate and deeper checks that run when nee
 |---|---|---|
 | Quality gate | Fast proof that the most important browser journeys still work | Yes |
 | Cross-browser smoke | Firefox and WebKit confidence on key paths | Yes in CI |
+| Responsive smoke | Mobile (Pixel 7) and tablet (iPad) viewport checks on key paths | Yes in CI |
 | Full regression | Broader page and content checks | No |
 | Forms | HubSpot iframe and safe form checks | No |
 | Accessibility | Automated axe checks | No |
@@ -97,6 +99,7 @@ npm run demo
 | `npm run test:accessibility` | Automated axe checks |
 | `npm run test:browser-health` | First-party browser health checks |
 | `npm run test:performance` | LCP and TTFB audit |
+| `npm run test:responsive` | Mobile and tablet viewport smoke |
 | `npm run demo` | Headed quality gate plus local HTML report |
 | `npm run report` | Open the latest local Playwright report |
 
@@ -113,7 +116,7 @@ GitHub Actions runs on pushes and pull requests to `main`.
 The workflow:
 
 1. Runs the selected Chromium suite in four shards.
-2. Runs Firefox and WebKit smoke checks for the quality gate.
+2. Runs Firefox, WebKit, mobile (Pixel 7), and tablet (iPad) smoke checks for the quality gate.
 3. Merges Playwright blob reports into one HTML report.
 4. Publishes the portfolio page and report to GitHub Pages.
 

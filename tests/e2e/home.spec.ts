@@ -19,9 +19,13 @@ test.describe('Home page', () => {
     await expect(cta).toHaveAttribute('href', /book-a-demo/);
   });
 
-  test('Log In button is visible in the header @smoke', async ({ page, navigate }) => {
+  test('Log In button is visible in the header @smoke', async ({ page, navigate }, testInfo) => {
     await navigate(URLS.home);
-    const loginLink = page.getByRole('link', { name: /log in/i });
+    const isMobile = (testInfo.project.use.viewport?.width ?? 1280) < 900;
+    if (isMobile) {
+      await page.getByRole('button', { name: /menu|navigation/i }).first().click();
+    }
+    const loginLink = page.getByRole('link', { name: /log in/i }).first();
     await expect(loginLink).toBeVisible();
     await expect(loginLink).toHaveAttribute('href', new RegExp(EXTERNAL_URLS.login));
   });
