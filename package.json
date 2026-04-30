@@ -1,0 +1,25 @@
+{
+  "name": "volygroup-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "ui": "playwright test --ui",
+    "demo": "playwright test --grep @smoke --grep-invert @performance --project=chromium --headed && playwright show-report",
+    "test": "npm run test:gate",
+    "test:gate": "playwright test --grep @smoke --grep-invert @performance --project=chromium",
+    "test:regression": "playwright test --project=chromium --grep-invert @performance",
+    "test:accessibility": "playwright test tests/e2e/accessibility.spec.ts --project=chromium",
+    "test:browser-health": "playwright test tests/e2e/browser-health.spec.ts --project=chromium",
+    "test:forms": "playwright test tests/e2e/forms/ --project=chromium",
+    "test:seo": "playwright test tests/e2e/seo.spec.ts --project=chromium",
+    "test:performance": "playwright test tests/e2e/performance.spec.ts --project=chromium",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.0.0",
+    "dotenv": "^16.4.0",
+    "typescript": "^5.7.0"
+  }
+}

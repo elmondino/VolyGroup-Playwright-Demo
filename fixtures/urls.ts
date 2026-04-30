@@ -1,0 +1,36 @@
+export const URLS = {
+  home: '/',
+  yachtAccounting: '/yacht-accounting',
+  apaManagement: '/apa-management',
+  volyFeatures: '/voly-features',
+  multiAssetManagement: '/multi-asset-management',
+  treasuryManagement: '/voly-foreign-exchange',
+  security: '/security',
+  familyOffice: '/family-office',
+  prepaidCard: '/prepaid-card',
+  certification: '/certification',
+  captainsAndCrew: '/captainsandcrew',
+  familyOffices: '/family-offices',
+  managementCompany: '/management-company',
+  superyachtOwner: '/superyacht-owner',
+  bookADemo: '/book-a-demo',
+  news: '/news',
+  newsletterSignup: '/newsletter-signup',
+  legal: '/legal',
+  gdpr: '/gdpr',
+  freeVolyApa: '/free-voly-apa',
+} as const;
+
+export const EXTERNAL_URLS = {
+  login: 'https://secure.voly.co.uk',
+  forgotPassword: 'https://secure.voly.co.uk/flo.php',
+  voyonic: 'https://voyonic.com',
+  pinpointWorks: 'https://www.pinpointworks.com',
+  volyEntertainment: 'https://www.volyentertainment.com',
+  enrolNow: 'https://voly.myabsorb.eu/#/login',
+  appleAppStore: 'https://apps.apple.com/us/app/voly-yachting/id6449971161',
+  googlePlay: 'https://play.google.com/store/apps/details?id=com.volygroup.voly',
+  isoCertPdf:
+    'https://www.volygroup.com/s/Voly-Limited-ISO-27001-2022-Certificate-to-August-2026-1-153.pdf',
+  isoQsl: 'https://www.isoqsltd.com/iso-certification/iso-27001-information-security-management-certification/',
+} as const;

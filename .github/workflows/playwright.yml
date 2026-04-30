@@ -1,0 +1,198 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Test suite to run"
+        required: false
+        default: "quality-gate"
+        type: choice
+        options:
+          - quality-gate
+          - full-regression
+          - forms
+          - seo
+          - accessibility
+          - browser-health
+          - performance
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: "Playwright (shard ${{ matrix.shard }}/${{ matrix.total-shards }})"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+        total-shards: [4]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        run: |
+          SUITE="${{ github.event.inputs.suite || 'quality-gate' }}"
+          SHARD_FLAG="--shard=${{ matrix.shard }}/${{ matrix.total-shards }}"
+          case "$SUITE" in
+            quality-gate)
+              npx playwright test --grep @smoke --grep-invert @performance --project=chromium $SHARD_FLAG
+              ;;
+            full-regression)
+              npx playwright test --project=chromium --grep-invert @performance $SHARD_FLAG
+              ;;
+            forms)
+              npx playwright test tests/e2e/forms/ --project=chromium --grep-invert @performance $SHARD_FLAG
+              ;;
+            accessibility)
+              npx playwright test tests/e2e/accessibility.spec.ts --project=chromium $SHARD_FLAG
+              ;;
+            seo)
+              npx playwright test tests/e2e/seo.spec.ts --project=chromium $SHARD_FLAG
+              ;;
+            browser-health)
+              npx playwright test tests/e2e/browser-health.spec.ts --project=chromium $SHARD_FLAG
+              ;;
+            performance)
+              npx playwright test tests/e2e/performance.spec.ts --project=chromium $SHARD_FLAG
+              ;;
+            *)
+              echo "Unknown suite: $SUITE"
+              exit 1
+              ;;
+          esac
+        env:
+          BASE_URL: https://www.volygroup.com
+          LOGIN_URL: https://secure.voly.co.uk
+          TEST_ENV: prod
+          CI: true
+          PW_REPORTER: blob
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report/
+          retention-days: 7
+
+  cross-browser:
+    name: "Cross-browser smoke (${{ matrix.browser }})"
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.suite == 'quality-gate' || github.event.inputs.suite == 'full-regression' }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ${{ matrix.browser }} browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run smoke suite on ${{ matrix.browser }}
+        run: npx playwright test --grep @smoke --grep-invert @performance --project=${{ matrix.browser }}
+        env:
+          BASE_URL: https://www.volygroup.com
+          TEST_ENV: prod
+          CI: true
+          PW_REPORTER: blob
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.browser }}
+          path: blob-report/
+          retention-days: 7
+
+  merge-report:
+    name: Merge & build HTML report
+    needs: [test, cross-browser]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into single HTML report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload merged HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Build GitHub Pages site
+        run: |
+          mkdir -p pages-site/report
+          cp -R site/. pages-site/
+          cp -R playwright-report/. pages-site/report/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-site/
+
+  deploy-pages:
+    name: Publish report to GitHub Pages
+    needs: merge-report
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
