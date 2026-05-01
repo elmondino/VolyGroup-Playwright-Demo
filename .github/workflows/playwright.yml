@@ -20,6 +20,7 @@ on:
           - accessibility
           - browser-health
           - performance
+          - visual-regression
 
 permissions:
   contents: read
@@ -80,6 +81,9 @@ jobs:
               ;;
             performance)
               npx playwright test tests/e2e/performance.spec.ts --project=chromium $SHARD_FLAG
+              ;;
+            visual-regression)
+              npx playwright test --project=visual-chromium $SHARD_FLAG
               ;;
             *)
               echo "Unknown suite: $SUITE"

@@ -8,6 +8,12 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 4 : undefined,
   timeout: 30_000,
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      threshold: 0.2,
+    },
+  },
 
   // CI uses blob reporter so shards can be merged into one HTML report.
   // Local runs default to the rich HTML + list combo.
@@ -53,6 +59,17 @@ export default defineConfig({
       name: 'tablet',
       use: { ...devices['iPad (gen 7)'] },
       testIgnore: ['**/visual/**'],
+    },
+
+    // Focused stakeholder visual checks: opt-in because diffs need review
+    {
+      name: 'visual-chromium',
+      testMatch: ['**/visual/**/*.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1366, height: 768 },
+        deviceScaleFactor: 1,
+      },
     },
   ],
 });

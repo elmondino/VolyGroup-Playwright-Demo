@@ -2,7 +2,7 @@
 
 This is a Playwright testing framework for [volygroup.com](https://www.volygroup.com). It is designed to show a practical QA approach for a public marketing site: a small release gate, safe form checks, useful browser coverage, and reports that can be opened directly in a web browser.
 
-The framework uses Playwright where it adds the most value: real browser journeys, page routing, links and CTAs, embedded HubSpot forms, login entry points, cross-browser smoke checks, and traceable HTML reports.
+The framework uses Playwright where it adds the most value: real browser journeys, page routing, links and CTAs, embedded HubSpot forms, login entry points, cross-browser smoke checks, focused visual regression, and traceable HTML reports.
 
 ## Public Links
 
@@ -24,6 +24,7 @@ The Playwright HTML report is the main stakeholder view. It is hosted on GitHub 
 - Footer, legal, news, and navigation checks.
 - Firefox and WebKit smoke coverage in CI.
 - Mobile and tablet viewport smoke coverage in CI (Pixel 7 and iPad).
+- Focused visual regression for key stakeholder pages.
 - Targeted accessibility, SEO, browser health, and performance suites.
 
 ## Test Strategy
@@ -41,8 +42,11 @@ The suite is split into a small default gate and deeper checks that run when nee
 | SEO | Basic metadata checks | No |
 | Browser health | First-party browser errors and failed requests | No |
 | Performance | LCP and TTFB audit | No |
+| Visual regression | Approved first-viewport screenshots for key stakeholder pages | No |
 
 This keeps the default run useful without turning every push into a slow site crawl.
+
+Visual regression is separate because screenshot diffs need human judgement. It catches brand and layout regressions that text assertions miss, such as missing hero imagery, clipped headings, spacing changes, and broken page presentation. The current suite compares the first viewport of the Home, Book a Demo, Yacht Accounting, Captains and Crew, and Security pages in a stable Chromium desktop project.
 
 ## Production Safety
 
@@ -65,7 +69,7 @@ Playwright is not used as a replacement for every QA tool. Some checks are bette
 | Broken links across the whole site | Lychee, Muffet, Screaming Frog |
 | Performance budgets | Lighthouse CI, WebPageTest, PageSpeed Insights, CrUX |
 | Deeper accessibility review | Accessibility Insights, axe DevTools, screen reader checks |
-| Visual regression | Percy, Applitools, Chromatic, or owned Playwright baselines |
+| Visual regression | Owned Playwright baselines for this focused suite; Percy, Applitools, or Chromatic for larger team review workflows |
 | Security checks | OWASP ZAP baseline, security header checks, dependency scanning |
 | Analytics events | GTM preview, GA4 DebugView, vendor consoles |
 
@@ -100,8 +104,15 @@ npm run demo
 | `npm run test:browser-health` | First-party browser health checks |
 | `npm run test:performance` | LCP and TTFB audit |
 | `npm run test:responsive` | Mobile and tablet viewport smoke |
+| `npm run test:visual` | Focused visual regression baselines |
 | `npm run demo` | Headed quality gate plus local HTML report |
 | `npm run report` | Open the latest local Playwright report |
+
+To approve an intentional visual change, update the snapshots after review:
+
+```bash
+npm run test:visual -- --update-snapshots
+```
 
 For one-off debugging, Playwright can be called directly instead of adding more permanent scripts:
 
@@ -119,5 +130,7 @@ The workflow:
 2. Runs Firefox, WebKit, mobile (Pixel 7), and tablet (iPad) smoke checks for the quality gate.
 3. Merges Playwright blob reports into one HTML report.
 4. Publishes the portfolio page and report to GitHub Pages.
+
+The workflow can also be triggered manually with the `visual-regression` suite to review screenshot baselines and diffs without adding visual checks to the default push gate.
 
 The published report is available at https://elmondino.github.io/VolyGroup-Playwright-Demo/report/ after each successful workflow run on `main`.

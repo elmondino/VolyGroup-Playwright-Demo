@@ -14,6 +14,7 @@
     "test:seo": "playwright test tests/e2e/seo.spec.ts --project=chromium",
     "test:performance": "playwright test tests/e2e/performance.spec.ts --project=chromium",
     "test:responsive": "playwright test --grep @smoke --grep-invert @performance --project=mobile-chrome --project=tablet",
+    "test:visual": "playwright test --project=visual-chromium",
     "report": "playwright show-report"
   },
   "devDependencies": {
