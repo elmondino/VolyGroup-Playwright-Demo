@@ -90,7 +90,7 @@ test.describe('HubSpot form submission contract', () => {
   test(
     'Book a Demo form serialises correctly shaped field data before submit @smoke',
     async ({ page }) => {
-      await page.goto(URLS.bookADemo);
+      await page.goto(URLS.bookADemo, { waitUntil: 'domcontentloaded' });
       await acceptCookies(page);
 
       const frame = await getHubSpotContentFrame(page);

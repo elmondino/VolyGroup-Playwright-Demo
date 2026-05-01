@@ -97,7 +97,8 @@ export const test = base.extend<VolyFixtures>({
 
   navigate: async ({ page }, use) => {
     await use(async (path: string) => {
-      await page.goto(path);
+      // Live marketing pages can keep the load event open on third-party media.
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
       await acceptCookies(page);
     });
   },

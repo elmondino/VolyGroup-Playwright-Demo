@@ -41,6 +41,19 @@ async function stabiliseForVisualCheck(page: Page): Promise<void> {
         transition-delay: 0s !important;
         scroll-behavior: auto !important;
       }
+
+      .sqs-cookie-banner-v2,
+      [class*="sqs-cookie" i],
+      [id*="sqs-cookie" i],
+      [class*="cookie-banner" i],
+      [id*="cookie-banner" i],
+      [id*="zsiq" i],
+      [class*="zsiq" i],
+      [id*="salesiq" i],
+      [class*="salesiq" i] {
+        display: none !important;
+        visibility: hidden !important;
+      }
     `,
   });
 
@@ -59,6 +72,10 @@ function visualMasks(page: Page): Locator[] {
     page.locator('iframe'),
     page.locator('video'),
     page.locator('.sqs-cookie-banner-v2'),
+    page.locator('[class*="sqs-cookie" i]'),
+    page.locator('[id*="sqs-cookie" i]'),
+    page.locator('[class*="cookie-banner" i]'),
+    page.locator('[id*="cookie-banner" i]'),
     page.locator('.sqs-announcement-bar'),
     page.locator('[id*="hubspot" i]'),
     page.locator('[id*="hs-form" i]'),
